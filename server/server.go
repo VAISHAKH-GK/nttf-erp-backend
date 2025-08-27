@@ -1,13 +1,33 @@
 package server
 
-import "github.com/gofiber/fiber/v3"
+import (
+	"context"
+	"errors"
 
-func Run(port string) {
-	var app = fiber.New()
+	"github.com/gofiber/fiber/v3"
+)
 
-	app.Get("/", func(c fiber.Ctx) error {
-		return c.SendString("Index route")
-	})
+type WebServer struct {
+	*fiber.App
+}
 
-	app.Listen(":"+port, fiber.ListenConfig{EnablePrefork: true})
+func (s *WebServer) Shutdown(ctx context.Context) error {
+	var errs []error
+	if err := s.ShutdownWithContext(ctx); err != nil {
+		errs = append(errs, err)
+	}
+
+	if len(errs) > 0 {
+		return errors.Join(errs...)
+	}
+
+	return nil
+}
+
+func New() *WebServer {
+	var server = &WebServer{
+		App: fiber.New(),
+	}
+
+	return server
 }
