@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/MagnaBit/nttf-erp-backend/server"
+	"github.com/MagnaBit/nttf-erp-backend/internal/server"
 	"github.com/gofiber/fiber/v3"
 
 	_ "github.com/joho/godotenv/autoload"
@@ -21,7 +21,7 @@ func gracefulShutDown(fiberServer *server.WebServer, done chan bool) {
 
 	<-ctx.Done()
 
-	log.Println("Shuttin down gracefully, Press Ctrl+C for force shutdown")
+	log.Println("Shutting down gracefully, Press Ctrl+C for force shutdown")
 	stop()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
