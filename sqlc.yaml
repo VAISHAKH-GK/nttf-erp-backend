@@ -8,3 +8,4 @@ sql:
         package: "generated"
         out: "internal/db/generated"
         emit_json_tags: true
+        sql_package: "pgx/v5"

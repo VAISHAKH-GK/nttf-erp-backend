@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -30,9 +29,6 @@ func gracefulShutDown(fiberServer *server.WebServer, done chan bool) {
 	if err := fiberServer.Shutdown(ctx); err != nil {
 		log.Printf("Server stopped with error %v", err)
 	}
-
-	fmt.Println("Stopping Exiting")
-	done <- true
 }
 
 func main() {
@@ -46,9 +42,10 @@ func main() {
 	var s = server.New()
 	s.RegisterRoutes()
 
-	go s.App.Listen(":"+port, fiber.ListenConfig{EnablePrefork: true})
 	go gracefulShutDown(s, done)
+	if err := s.App.Listen(":"+port, fiber.ListenConfig{EnablePrefork: true}); err != nil {
+		log.Fatalf("Server exited with error %v", err)
+	}
 
-	<-done
 	log.Println("Graceful shutdown completed")
 }
