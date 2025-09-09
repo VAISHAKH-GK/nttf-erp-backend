@@ -1,6 +1,8 @@
 package server
 
 import (
+	"github.com/MagnaBit/nttf-erp-backend/internal/handlers"
+	"github.com/MagnaBit/nttf-erp-backend/internal/services"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/cors"
 )
@@ -13,6 +15,13 @@ func (s *WebServer) RegisterRoutes() {
 	}))
 
 	s.App.Get("/", s.HandleIndexRotue)
+
+	api := s.App.Group("/api")
+
+	userService := services.NewUserService(s.DB.Queries)
+	userHandler := handlers.NewUserHandler(userService)
+
+	api.Post("/login", userHandler.Login)
 }
 
 func (s *WebServer) HandleIndexRotue(c fiber.Ctx) error {
