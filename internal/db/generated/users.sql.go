@@ -9,12 +9,12 @@ import (
 	"context"
 )
 
-const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT user_id, email, username, password, created_at, created_by, updated_at, updated_by FROM users WHERE email = $1
+const getUserByUsername = `-- name: GetUserByUsername :one
+SELECT user_id, email, username, password, created_at, created_by, updated_at, updated_by FROM users WHERE username = $1
 `
 
-func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
-	row := q.db.QueryRow(ctx, getUserByEmail, email)
+func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByUsername, username)
 	var i User
 	err := row.Scan(
 		&i.UserID,
