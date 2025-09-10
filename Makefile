@@ -13,6 +13,9 @@ sqlc:
 build: sqlc
 	@go build -o $(EXE) cmd/api/main.go
 
+seed:
+	@go run cmd/seed/main.go
+
 run: build
 	@$(RUN)
 

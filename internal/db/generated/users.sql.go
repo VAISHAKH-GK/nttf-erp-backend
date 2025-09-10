@@ -28,3 +28,18 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 	)
 	return i, err
 }
+
+const insertUser = `-- name: InsertUser :exec
+INSERT INTO users(email, username, password) VALUES($1, $2, $3)
+`
+
+type InsertUserParams struct {
+	Email    string `json:"email"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) error {
+	_, err := q.db.Exec(ctx, insertUser, arg.Email, arg.Username, arg.Password)
+	return err
+}
