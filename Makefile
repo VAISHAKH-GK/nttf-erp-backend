@@ -1,11 +1,20 @@
+# Detect OS
+ifeq ($(OS),Windows_NT)
+    EXE = bin\api.exe
+    RUN = .\$(EXE)
+else
+    EXE = bin/api
+    RUN = ./$(EXE)
+endif
+
 sqlc:
 	@sqlc generate
 
 build: sqlc
-	@go build -o bin/api cmd/api/main.go
+	@go build -o $(EXE) cmd/api/main.go
 
 run: build
-	@./bin/api
+	@$(RUN)
 
 up:
 	@goose up

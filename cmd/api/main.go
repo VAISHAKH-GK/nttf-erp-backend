@@ -14,7 +14,7 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
-func gracefulShutDown(fiberServer *server.WebServer, done chan bool) {
+func gracefulShutDown(fiberServer *server.WebServer) {
 	var ctx, stop = signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
@@ -33,7 +33,6 @@ func gracefulShutDown(fiberServer *server.WebServer, done chan bool) {
 
 func main() {
 	var port string
-	var done = make(chan bool)
 
 	if port = os.Getenv("PORT"); port == "" {
 		port = "3000"
@@ -42,7 +41,7 @@ func main() {
 	var s = server.New()
 	s.RegisterRoutes()
 
-	go gracefulShutDown(s, done)
+	go gracefulShutDown(s)
 	if err := s.App.Listen(":"+port, fiber.ListenConfig{EnablePrefork: true}); err != nil {
 		log.Fatalf("Server exited with error %v", err)
 	}
