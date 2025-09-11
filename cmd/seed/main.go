@@ -11,12 +11,20 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
-type Store struct {
+type store struct {
 	Db      *pgx.Conn
 	Queries *generated.Queries
 }
 
-var DB Store
+var users []generated.InsertUserParams = []generated.InsertUserParams{
+	{
+		Username: "Admin",
+		Email:    "admin@nttf.co.in",
+		Password: "password",
+	},
+}
+
+var dbStore store
 
 func connectDb(connString string) {
 	conn, err := pgx.Connect(context.Background(), connString)
@@ -26,32 +34,31 @@ func connectDb(connString string) {
 
 	queries := generated.New(conn)
 
-	DB.Db = conn
-	DB.Queries = queries
+	dbStore.Db = conn
+	dbStore.Queries = queries
 }
 
-func AddAdminUser() {
-	var user generated.InsertUserParams
+func addUsers() {
+	for _, user := range users {
+		pass, err := utils.HashPassword(user.Password)
+		if err != nil {
+			log.Fatal("Adding admin user failed due to hash failure")
+		}
 
-	pass, err := utils.HashPassword("password")
-	if err != nil {
-		log.Fatal("Adding admin user failed due to hash failure")
+		user.Password = pass
+
+		if err := dbStore.Queries.InsertUser(context.Background(), user); err != nil {
+			log.Printf("User insertion failed with error %v", err)
+			return
+		}
 	}
 
-	user.Username = "Admin"
-	user.Email = "admin@nttf.co.in"
-	user.Password = pass
-
-	if err := DB.Queries.InsertUser(context.Background(), user); err != nil {
-		log.Printf("User insertion failed with error %v", err)
-		return
-	}
 }
 
 func main() {
 	var connString string = os.Getenv("GOOSE_DBSTRING")
 	connectDb(connString)
-	defer DB.Db.Close(context.Background())
+	defer dbStore.Db.Close(context.Background())
 
-	AddAdminUser()
+	addUsers()
 }
