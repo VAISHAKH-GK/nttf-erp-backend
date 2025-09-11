@@ -30,7 +30,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 }
 
 const insertUser = `-- name: InsertUser :exec
-INSERT INTO users(email, username, password) VALUES($1, $2, $3)
+INSERT INTO users(email, username, password) VALUES($1, $2, $3) ON CONFLICT DO NOTHING
 `
 
 type InsertUserParams struct {

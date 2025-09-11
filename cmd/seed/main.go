@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"os"
 
@@ -16,12 +17,8 @@ type store struct {
 	Queries *generated.Queries
 }
 
-var users []generated.InsertUserParams = []generated.InsertUserParams{
-	{
-		Username: "Admin",
-		Email:    "admin@nttf.co.in",
-		Password: "password",
-	},
+func (s *store) Close(ctx context.Context) {
+	s.Db.Close(ctx)
 }
 
 var dbStore store
@@ -38,18 +35,27 @@ func connectDb(connString string) {
 	dbStore.Queries = queries
 }
 
-func addUsers() {
+func loadData(path string, data any) error {
+	body, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+
+	return json.Unmarshal(body, data)
+}
+
+func addUsers(users []generated.InsertUserParams) {
 	for _, user := range users {
 		pass, err := utils.HashPassword(user.Password)
 		if err != nil {
-			log.Fatal("Adding admin user failed due to hash failure")
+			log.Printf("Skipping user %s due to hash error: %v", user.Email, err)
+			continue
 		}
 
 		user.Password = pass
 
 		if err := dbStore.Queries.InsertUser(context.Background(), user); err != nil {
 			log.Printf("User insertion failed with error %v", err)
-			return
 		}
 	}
 
@@ -58,7 +64,12 @@ func addUsers() {
 func main() {
 	var connString string = os.Getenv("GOOSE_DBSTRING")
 	connectDb(connString)
-	defer dbStore.Db.Close(context.Background())
+	defer dbStore.Close(context.Background())
 
-	addUsers()
+	var users []generated.InsertUserParams
+	if err := loadData("database/seeds/users.json", &users); err != nil {
+		log.Fatalf("Error while loading user data %v", err)
+	}
+
+	addUsers(users)
 }
