@@ -18,7 +18,7 @@ func (s *WebServer) RegisterRoutes() {
 
 	api := s.App.Group("/api")
 
-	userService := services.NewUserService(s.DB.Queries)
+	userService := services.NewUserService(s.DB.Queries, s.JwtSecret)
 	userHandler := handlers.NewUserHandler(userService)
 
 	api.Post("/login", userHandler.Login)

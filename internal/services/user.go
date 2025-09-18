@@ -4,21 +4,35 @@ import (
 	"context"
 
 	"github.com/MagnaBit/nttf-erp-backend/internal/db/generated"
+	"github.com/MagnaBit/nttf-erp-backend/utils"
 )
 
 type UserService struct {
-	queries *generated.Queries
+	queries   *generated.Queries
+	jwtSecret string
 }
 
-func NewUserService(queries *generated.Queries) *UserService {
-	return &UserService{queries: queries}
+func NewUserService(queries *generated.Queries, jwtSecret string) *UserService {
+	return &UserService{queries: queries, jwtSecret: jwtSecret}
 }
 
-func (s *UserService) GetUsers(username string) (generated.User, error) {
+func (s *UserService) Login(username string, password string) (string, error) {
 	user, err := s.queries.GetUserByUsername(context.Background(), username)
 	if err != nil {
-		return user, err
+		return "", ErrInvalidCredentials
 	}
 
-	return user, nil
+	if err = utils.CompareHash(password, user.Password); err != nil {
+		return "", ErrInvalidCredentials
+	}
+
+	token, err := utils.GenerateJwtToken(s.jwtSecret, map[string]any{
+		"user_id": user.UserID,
+		"email":   user.Email,
+	})
+	if err != nil {
+		return "", ErrTokenGeneration
+	}
+
+	return token, nil
 }

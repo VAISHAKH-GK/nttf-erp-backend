@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+	"os"
 
 	"github.com/MagnaBit/nttf-erp-backend/internal/db"
 	"github.com/gofiber/fiber/v3"
@@ -10,7 +11,8 @@ import (
 
 type WebServer struct {
 	*fiber.App
-	DB *db.Store
+	DB        *db.Store
+	JwtSecret string
 }
 
 func (s *WebServer) Shutdown(ctx context.Context) error {
@@ -32,10 +34,12 @@ func (s *WebServer) Shutdown(ctx context.Context) error {
 
 func New() *WebServer {
 	db := db.ConnectDB()
+	secret := os.Getenv("JWT_SECRET")
 
 	var server = &WebServer{
-		App: fiber.New(),
-		DB:  db,
+		App:       fiber.New(),
+		DB:        db,
+		JwtSecret: secret,
 	}
 
 	return server
