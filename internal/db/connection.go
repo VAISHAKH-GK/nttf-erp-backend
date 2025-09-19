@@ -20,7 +20,13 @@ func ConnectDB() *Store {
 
 	pool, err := pgxpool.NewWithConfig(context.Background(), config)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Database Connection failed %v", err)
+		fmt.Fprintf(os.Stderr, "Failed to create DB pool %v", err)
+		os.Exit(1)
+	}
+
+	err = pool.Ping(context.Background())
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Database Connection failed \n%v", err)
 		os.Exit(1)
 	}
 
