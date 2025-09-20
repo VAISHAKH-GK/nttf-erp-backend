@@ -20,28 +20,43 @@ go mod tidy
 
 ### Development
 
-#### Build & Run (Linux / macOS)
-
-```bash
-go build -o bin/api cmd/api/main.go
-bin/api
-```
-
-#### Build & Run (Windows)
+#### Migrate Database
 
 ``` bash
-go build -o bin\api.exe cmd\api\main.go
-bin\api.exe
+make up # Apply latest migrations
+make down # Rollback to version 1
+make up-by-one # Migrate DB up by 1
+make down-by-one # Migrate DB down by 1
+```
+
+#### Seed Database
+
+``` bash
+make seed
+```
+
+#### Build
+
+```bash
+make build
+```
+
+#### Run
+
+``` bash
+make run
 ```
 
 ### Environment Variables
 
-- `PORT` - The port the server listens on. Defaults to 3000 if not set.
+Copy `.env.example` to `.env` and update as needed:
 
-**Example**
-
-``` bash
-PORT=4000 ./bin/api
+``` env
+PORT=3000
+JWT_SECRET=supersecret
+GOOSE_DRIVER=postgres
+GOOSE_DBSTRING=postgres://user:pass@localhost:5432/nttf?sslmode=disable
+GOOSE_MIGRATION_DIR=./database/migrations
 ```
 
 ## Features
