@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"sync"
 
 	"github.com/MagnaBit/nttf-erp-backend/internal/db"
 	"github.com/gofiber/fiber/v3"
@@ -16,14 +17,22 @@ type WebServer struct {
 }
 
 func (s *WebServer) Shutdown(ctx context.Context) error {
+	var wg sync.WaitGroup
 	var errs []error
-	if err := s.ShutdownWithContext(ctx); err != nil {
-		errs = append(errs, err)
-	}
+
+	wg.Go(func() {
+		if err := s.ShutdownWithContext(ctx); err != nil {
+			errs = append(errs, err)
+		}
+	})
 
 	if s.DB != nil {
-		s.DB.Close(ctx)
+		wg.Go(func() {
+			s.DB.Close(ctx)
+		})
 	}
+
+	wg.Wait()
 
 	if len(errs) > 0 {
 		return errors.Join(errs...)
