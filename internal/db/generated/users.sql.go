@@ -10,14 +10,14 @@ import (
 )
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT user_id, email, username, password, created_at, created_by, updated_at, updated_by FROM users WHERE username = $1
+SELECT id, email, username, password, created_at, created_by, updated_at, updated_by FROM users WHERE username = $1
 `
 
 func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
 	row := q.db.QueryRow(ctx, getUserByUsername, username)
 	var i User
 	err := row.Scan(
-		&i.UserID,
+		&i.ID,
 		&i.Email,
 		&i.Username,
 		&i.Password,

@@ -1,14 +1,14 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE users (
-  user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email TEXT NOT NULL UNIQUE,
   username TEXT NOT NULL UNIQUE,
   password VARCHAR(60) NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  created_by UUID REFERENCES users(user_id),
+  created_by UUID REFERENCES users(id),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_by UUID REFERENCES users(user_id)
+  updated_by UUID REFERENCES users(id)
 );
 
 CREATE OR REPLACE FUNCTION set_timestamp_function() RETURNS TRIGGER AS $$

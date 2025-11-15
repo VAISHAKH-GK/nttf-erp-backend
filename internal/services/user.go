@@ -27,8 +27,8 @@ func (s *UserService) Login(username string, password string) (string, error) {
 	}
 
 	token, err := utils.GenerateJwtToken(s.jwtSecret, map[string]any{
-		"user_id": user.UserID,
-		"email":   user.Email,
+		"id":    user.ID,
+		"email": user.Email,
 	})
 	if err != nil {
 		return "", ErrTokenGeneration
