@@ -7,6 +7,8 @@ package generated
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 const getUserByUsername = `-- name: GetUserByUsername :one
@@ -29,8 +31,8 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 	return i, err
 }
 
-const insertUser = `-- name: InsertUser :exec
-INSERT INTO users(email, username, password) VALUES($1, $2, $3) ON CONFLICT DO NOTHING
+const insertUser = `-- name: InsertUser :one
+INSERT INTO users(email, username, password) VALUES($1, $2, $3) ON CONFLICT DO NOTHING RETURNING id
 `
 
 type InsertUserParams struct {
@@ -39,7 +41,9 @@ type InsertUserParams struct {
 	Password string `json:"password"`
 }
 
-func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) error {
-	_, err := q.db.Exec(ctx, insertUser, arg.Email, arg.Username, arg.Password)
-	return err
+func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, insertUser, arg.Email, arg.Username, arg.Password)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
 }

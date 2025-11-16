@@ -5,16 +5,36 @@
 package generated
 
 import (
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type AccountType struct {
+	ID        uuid.UUID          `json:"id"`
+	Name      string             `json:"name"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	CreatedBy uuid.UUID          `json:"created_by"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+	UpdatedBy uuid.UUID          `json:"updated_by"`
+	IsActive  pgtype.Bool        `json:"is_active"`
+}
+
 type User struct {
-	ID        pgtype.UUID        `json:"id"`
+	ID        uuid.UUID          `json:"id"`
 	Email     string             `json:"email"`
 	Username  string             `json:"username"`
 	Password  string             `json:"password"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	CreatedBy pgtype.UUID        `json:"created_by"`
+	CreatedBy uuid.UUID          `json:"created_by"`
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	UpdatedBy pgtype.UUID        `json:"updated_by"`
+	UpdatedBy uuid.UUID          `json:"updated_by"`
+}
+
+type UserAccountType struct {
+	UserID        uuid.UUID          `json:"user_id"`
+	AccountTypeID uuid.UUID          `json:"account_type_id"`
+	CreatedAt     pgtype.Timestamptz `json:"created_at"`
+	CreatedBy     uuid.UUID          `json:"created_by"`
+	UpdatedAt     pgtype.Timestamptz `json:"updated_at"`
+	UpdatedBy     uuid.UUID          `json:"updated_by"`
 }

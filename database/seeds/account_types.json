@@ -1,0 +1,5 @@
+[
+  {"name": "admin", "is_active": true},
+  {"name": "teacher", "is_active": true},
+  {"name": "student", "is_active": true}
+]

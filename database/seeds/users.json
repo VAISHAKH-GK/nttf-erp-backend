@@ -3,5 +3,15 @@
         "username": "admin",
         "email": "admin@nttf.co.in",
         "password": "password"
+    },
+    {
+        "username": "suresh",
+        "email": "suresh@nttf.co.in",
+        "password": "password"
+    },
+    {
+        "username": "deep",
+        "email": "ttc0824001@nttf.co.in",
+        "password": "password"
     }
 ]
