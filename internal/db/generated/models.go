@@ -5,6 +5,8 @@
 package generated
 
 import (
+	"net/netip"
+
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
@@ -16,7 +18,27 @@ type AccountType struct {
 	CreatedBy uuid.UUID          `json:"created_by"`
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 	UpdatedBy uuid.UUID          `json:"updated_by"`
-	IsActive  pgtype.Bool        `json:"is_active"`
+	IsActive  *bool              `json:"is_active"`
+}
+
+type RefreshToken struct {
+	ID        uuid.UUID          `json:"id"`
+	SessionID uuid.UUID          `json:"session_id"`
+	Token     *string            `json:"token"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
+	IsRevoked bool               `json:"is_revoked"`
+	RevokedAt pgtype.Timestamptz `json:"revoked_at"`
+}
+
+type Session struct {
+	ID         uuid.UUID          `json:"id"`
+	UserID     uuid.UUID          `json:"user_id"`
+	UserAgent  *string            `json:"user_agent"`
+	IpAddress  *netip.Addr        `json:"ip_address"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+	ExpiresAt  pgtype.Timestamptz `json:"expires_at"`
+	LastUsedAt pgtype.Timestamptz `json:"last_used_at"`
 }
 
 type User struct {

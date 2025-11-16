@@ -3,6 +3,6 @@ package services
 import "errors"
 
 var (
-	ErrInvalidCredentials = errors.New("Invalid credentials")
-	ErrTokenGeneration    = errors.New("Token generation failed")
+	ErrInvalidCredentials = errors.New("invalid credentials")
+	ErrTokenGeneration    = errors.New("token generation failed")
 )

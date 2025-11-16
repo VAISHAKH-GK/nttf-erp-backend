@@ -9,7 +9,6 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const insertAccountType = `-- name: InsertAccountType :one
@@ -17,8 +16,8 @@ INSERT INTO account_types(name, is_active) VALUES($1, $2) ON CONFLICT DO NOTHING
 `
 
 type InsertAccountTypeParams struct {
-	Name     string      `json:"name"`
-	IsActive pgtype.Bool `json:"is_active"`
+	Name     string `json:"name"`
+	IsActive *bool  `json:"is_active"`
 }
 
 func (q *Queries) InsertAccountType(ctx context.Context, arg InsertAccountTypeParams) (uuid.UUID, error) {
