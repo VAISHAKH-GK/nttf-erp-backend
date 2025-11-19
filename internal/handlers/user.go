@@ -4,6 +4,7 @@ import (
 	"github.com/MagnaBit/nttf-erp-backend/internal/dto"
 	"github.com/MagnaBit/nttf-erp-backend/internal/services"
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/session"
 )
 
 type UserHandler struct {
@@ -15,6 +16,7 @@ func NewUserHandler(service *services.UserService) *UserHandler {
 }
 
 func (h *UserHandler) Login(c fiber.Ctx) error {
+	sess := session.FromContext(c)
 	var body dto.LoginReq
 
 	userAgent := c.Get("User-Agent")
@@ -33,5 +35,6 @@ func (h *UserHandler) Login(c fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Server error"})
 	}
 
+	sess.Set("refreshToken", refreshToken)
 	return c.Status(fiber.StatusOK).JSON(dto.LoginRes{AuthToken: authToken, RefreshToken: refreshToken})
 }

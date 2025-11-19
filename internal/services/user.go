@@ -47,7 +47,7 @@ func (s *UserService) Login(data dto.LoginReq, userAgent string, ip string) (str
 		return "", "", ErrTokenGeneration
 	}
 
-	if _, err := s.queries.InsertRefreshToken(context.Background(), generated.InsertRefreshTokenParams{SessionID: sessionId, Token: &hashedToken}); err == nil {
+	if _, err := s.queries.InsertRefreshToken(context.Background(), generated.InsertRefreshTokenParams{SessionID: sessionId, Token: &hashedToken}); err != nil {
 		return "", "", ErrTokenGeneration
 	}
 

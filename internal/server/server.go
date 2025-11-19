@@ -8,6 +8,7 @@ import (
 
 	"github.com/MagnaBit/nttf-erp-backend/internal/db"
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/session"
 )
 
 type WebServer struct {
@@ -50,6 +51,8 @@ func New() *WebServer {
 		DB:        db,
 		JwtSecret: secret,
 	}
+
+	server.Use(session.New())
 
 	return server
 }
