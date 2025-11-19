@@ -15,7 +15,7 @@ CREATE TABLE refresh_tokens(
   session_id UUID REFERENCES sessions(id) ON DELETE CASCADE,
   token TEXT UNIQUE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  expires_at TIMESTAMPTZ,
+  expires_at TIMESTAMPTZ NOT NULL DEFAULT NOW() + INTERVAL '30 DAYS',
   is_revoked BOOLEAN NOT NULL DEFAULT FALSE,
   revoked_at TIMESTAMPTZ
 );

@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"time"
 
 	"github.com/MagnaBit/nttf-erp-backend/internal/db/generated"
 	"github.com/MagnaBit/nttf-erp-backend/internal/dto"
@@ -29,6 +30,8 @@ func (s *UserService) Login(data dto.LoginReq, userAgent string, ip string) (str
 	}
 
 	authToken, err := utils.GenerateJwtToken(s.jwtSecret, map[string]any{
+		"iat":   time.Now().Unix(),
+		"exp":   time.Now().Add(2 * time.Hour).Unix(),
 		"id":    user.ID,
 		"email": user.Email,
 	})
