@@ -10,7 +10,31 @@ import (
 	"net/netip"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
+
+const getRefreshToken = `-- name: GetRefreshToken :one
+SELECT rt.session_id, rt.token, rt.expires_at, rt.is_revoked FROM refresh_tokens as rt INNER JOIN sessions as s ON rt.session_id = s.id WHERE rt.is_revoked = FALSE AND NOW() > rt.expires_at
+`
+
+type GetRefreshTokenRow struct {
+	SessionID uuid.UUID          `json:"session_id"`
+	Token     *string            `json:"token"`
+	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
+	IsRevoked bool               `json:"is_revoked"`
+}
+
+func (q *Queries) GetRefreshToken(ctx context.Context) (GetRefreshTokenRow, error) {
+	row := q.db.QueryRow(ctx, getRefreshToken)
+	var i GetRefreshTokenRow
+	err := row.Scan(
+		&i.SessionID,
+		&i.Token,
+		&i.ExpiresAt,
+		&i.IsRevoked,
+	)
+	return i, err
+}
 
 const insertRefreshToken = `-- name: InsertRefreshToken :one
 INSERT INTO refresh_tokens(session_id, token) VALUES($1, $2) ON CONFLICT DO NOTHING RETURNING id

@@ -38,3 +38,12 @@ func (h *UserHandler) Login(c fiber.Ctx) error {
 	sess.Set("refreshToken", refreshToken)
 	return c.Status(fiber.StatusOK).JSON(dto.LoginRes{AuthToken: authToken, RefreshToken: refreshToken})
 }
+
+func (h *UserHandler) RefreshToken(c fiber.Ctx) error {
+	sess := session.FromContext(c)
+	refreshToken := sess.Get("refreshToken").(string)
+
+	h.service.RefreshToken(refreshToken)
+
+	return nil
+}

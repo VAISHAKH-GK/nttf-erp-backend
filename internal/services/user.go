@@ -53,3 +53,8 @@ func (s *UserService) Login(data dto.LoginReq, userAgent string, ip string) (str
 
 	return authToken, refreshToken, nil
 }
+
+func (s *UserService) RefreshToken(refreshToken string) {
+	hashedToken := utils.HashToken(refreshToken)
+
+}

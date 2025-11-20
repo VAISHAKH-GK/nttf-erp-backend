@@ -52,7 +52,10 @@ func New() *WebServer {
 		JwtSecret: secret,
 	}
 
-	server.Use(session.New())
+	server.Use(session.New(session.Config{
+		CookieHTTPOnly: true,
+		CookieSecure:   true,
+	}))
 
 	return server
 }
