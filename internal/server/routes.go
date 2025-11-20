@@ -21,7 +21,8 @@ func (s *WebServer) RegisterRoutes() {
 	userService := services.NewUserService(s.DB.Queries, s.JwtSecret)
 	userHandler := handlers.NewUserHandler(userService)
 
-	api.Post("/login", userHandler.Login)
+	api.Post("/auth/login", userHandler.Login)
+	api.Post("/auth/refresh", userHandler.RefreshToken)
 }
 
 func (s *WebServer) HandleIndexRotue(c fiber.Ctx) error {

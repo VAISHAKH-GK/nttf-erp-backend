@@ -10,7 +10,35 @@ import (
 	"net/netip"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
+
+const getRefreshTokenWithSession = `-- name: GetRefreshTokenWithSession :one
+SELECT rt.token, rt.expires_at as token_expires_at, rt.is_revoked, rt.session_id, s.expires_at as session_expires_at, s.user_id  FROM refresh_tokens as rt INNER JOIN sessions as s ON rt.session_id = s.id WHERE token = $1
+`
+
+type GetRefreshTokenWithSessionRow struct {
+	Token            *string            `json:"token"`
+	TokenExpiresAt   pgtype.Timestamptz `json:"token_expires_at"`
+	IsRevoked        bool               `json:"is_revoked"`
+	SessionID        uuid.UUID          `json:"session_id"`
+	SessionExpiresAt pgtype.Timestamptz `json:"session_expires_at"`
+	UserID           uuid.UUID          `json:"user_id"`
+}
+
+func (q *Queries) GetRefreshTokenWithSession(ctx context.Context, token *string) (GetRefreshTokenWithSessionRow, error) {
+	row := q.db.QueryRow(ctx, getRefreshTokenWithSession, token)
+	var i GetRefreshTokenWithSessionRow
+	err := row.Scan(
+		&i.Token,
+		&i.TokenExpiresAt,
+		&i.IsRevoked,
+		&i.SessionID,
+		&i.SessionExpiresAt,
+		&i.UserID,
+	)
+	return i, err
+}
 
 const insertRefreshToken = `-- name: InsertRefreshToken :one
 INSERT INTO refresh_tokens(session_id, token) VALUES($1, $2) ON CONFLICT DO NOTHING RETURNING id
@@ -43,4 +71,13 @@ func (q *Queries) InsertSession(ctx context.Context, arg InsertSessionParams) (u
 	var id uuid.UUID
 	err := row.Scan(&id)
 	return id, err
+}
+
+const revokeRefreshToken = `-- name: RevokeRefreshToken :exec
+UPDATE refresh_tokens SET is_revoked = true WHERE token = $1
+`
+
+func (q *Queries) RevokeRefreshToken(ctx context.Context, token *string) error {
+	_, err := q.db.Exec(ctx, revokeRefreshToken, token)
+	return err
 }

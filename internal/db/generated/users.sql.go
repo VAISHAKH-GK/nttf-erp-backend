@@ -11,6 +11,26 @@ import (
 	"github.com/google/uuid"
 )
 
+const getUserById = `-- name: GetUserById :one
+SELECT id, email, username, password, created_at, created_by, updated_at, updated_by FROM users WHERE id = $1
+`
+
+func (q *Queries) GetUserById(ctx context.Context, id uuid.UUID) (User, error) {
+	row := q.db.QueryRow(ctx, getUserById, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Username,
+		&i.Password,
+		&i.CreatedAt,
+		&i.CreatedBy,
+		&i.UpdatedAt,
+		&i.UpdatedBy,
+	)
+	return i, err
+}
+
 const getUserByUsername = `-- name: GetUserByUsername :one
 SELECT id, email, username, password, created_at, created_by, updated_at, updated_by FROM users WHERE username = $1
 `
