@@ -41,9 +41,12 @@ func (h *UserHandler) Login(c fiber.Ctx) error {
 
 func (h *UserHandler) RefreshToken(c fiber.Ctx) error {
 	sess := session.FromContext(c)
-	refreshToken := sess.Get("refreshToken").(string)
+	refreshToken := sess.Get("refreshToken")
+	if refreshToken == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "session expired"})
+	}
 
-	authToken, newRefreshToken, err := h.service.RefreshToken(refreshToken)
+	authToken, newRefreshToken, err := h.service.RefreshToken(refreshToken.(string))
 	if err != nil {
 		if err == services.ErrInvalidRefreshToken {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "session expired"})
