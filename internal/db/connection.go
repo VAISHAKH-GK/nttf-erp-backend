@@ -14,9 +14,9 @@ type Store struct {
 	Queries *generated.Queries
 }
 
-func ConnectDB() *Store {
-	config, _ := pgxpool.ParseConfig(os.Getenv("GOOSE_DBSTRING"))
-	config.MaxConns = 5
+func ConnectDB(connString string, maxConn int) *Store {
+	config, _ := pgxpool.ParseConfig(connString)
+	config.MaxConns = int32(maxConn)
 
 	pool, err := pgxpool.NewWithConfig(context.Background(), config)
 	if err != nil {

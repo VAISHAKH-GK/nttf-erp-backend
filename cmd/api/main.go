@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	"log"
-	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/MagnaBit/nttf-erp-backend/internal/config"
 	"github.com/MagnaBit/nttf-erp-backend/internal/server"
 	"github.com/gofiber/fiber/v3"
 
@@ -32,17 +32,13 @@ func gracefulShutDown(fiberServer *server.WebServer) {
 }
 
 func main() {
-	var port string
+	cfg := config.Load()
 
-	if port = os.Getenv("PORT"); port == "" {
-		port = "3000"
-	}
-
-	var s = server.New()
+	var s = server.New(cfg)
 	s.RegisterRoutes()
 
 	go gracefulShutDown(s)
-	if err := s.App.Listen(":"+port, fiber.ListenConfig{EnablePrefork: true}); err != nil {
+	if err := s.App.Listen(":"+cfg.Port, fiber.ListenConfig{EnablePrefork: true}); err != nil {
 		log.Fatalf("Server exited with error %v", err)
 	}
 

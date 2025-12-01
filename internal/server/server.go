@@ -3,9 +3,9 @@ package server
 import (
 	"context"
 	"errors"
-	"os"
 	"sync"
 
+	"github.com/MagnaBit/nttf-erp-backend/internal/config"
 	"github.com/MagnaBit/nttf-erp-backend/internal/db"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/session"
@@ -13,8 +13,8 @@ import (
 
 type WebServer struct {
 	*fiber.App
-	DB        *db.Store
-	JwtSecret string
+	DB     *db.Store
+	Config *config.Config
 }
 
 func (s *WebServer) Shutdown(ctx context.Context) error {
@@ -42,14 +42,15 @@ func (s *WebServer) Shutdown(ctx context.Context) error {
 	return nil
 }
 
-func New() *WebServer {
-	db := db.ConnectDB()
-	secret := os.Getenv("JWT_SECRET")
+func New(cfg *config.Config) *WebServer {
+	db := db.ConnectDB(cfg.DBString, cfg.MaxDBConns)
 
 	var server = &WebServer{
-		App:       fiber.New(),
-		DB:        db,
-		JwtSecret: secret,
+		App: fiber.New(fiber.Config{
+			AppName: "NTTF ERP API",
+		}),
+		DB:     db,
+		Config: cfg,
 	}
 
 	server.Use(session.New(session.Config{
