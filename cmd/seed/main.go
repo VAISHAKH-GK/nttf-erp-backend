@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/MagnaBit/nttf-erp-backend/internal/db/generated"
-	"github.com/MagnaBit/nttf-erp-backend/utils"
+	"github.com/MagnaBit/nttf-erp-backend/pkg/hash"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	_ "github.com/joho/godotenv/autoload"
@@ -49,7 +49,7 @@ func addUsers(users []generated.InsertUserParams) []uuid.UUID {
 	var ids []uuid.UUID
 
 	for _, user := range users {
-		pass, err := utils.HashPassword(user.Password)
+		pass, err := hash.HashPassword(user.Password)
 		if err != nil {
 			log.Printf("Skipping user %s due to hash error: %v", user.Email, err)
 			continue

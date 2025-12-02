@@ -1,4 +1,4 @@
-package utils
+package hash
 
 import (
 	"crypto/sha256"
@@ -8,8 +8,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+const saltCost int = 12
+
 func HashPassword(password string) (string, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), 12)
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), saltCost)
 	if err != nil {
 		return "", err
 	}
