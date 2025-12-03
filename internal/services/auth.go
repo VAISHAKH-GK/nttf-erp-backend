@@ -15,16 +15,16 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-type UserService struct {
+type AuthService struct {
 	queries   *generated.Queries
 	jwtSecret string
 }
 
-func NewUserService(queries *generated.Queries, jwtSecret string) *UserService {
-	return &UserService{queries: queries, jwtSecret: jwtSecret}
+func NewAuthService(queries *generated.Queries, jwtSecret string) *AuthService {
+	return &AuthService{queries: queries, jwtSecret: jwtSecret}
 }
 
-func (s *UserService) Login(data dto.LoginReq, userAgent string, ipAddr string) (string, string, error) {
+func (s *AuthService) Login(data dto.LoginReq, userAgent string, ipAddr string) (string, string, error) {
 	user, err := s.queries.GetUserByUsername(context.Background(), data.Username)
 	if err != nil {
 		return "", "", ErrInvalidCredentials
@@ -59,7 +59,7 @@ func (s *UserService) Login(data dto.LoginReq, userAgent string, ipAddr string) 
 	return authToken, refreshToken, nil
 }
 
-func (s *UserService) RefreshToken(refreshToken string) (string, string, error) {
+func (s *AuthService) RefreshToken(refreshToken string) (string, string, error) {
 	hashedToken := hash.HashToken(refreshToken)
 
 	session, err := s.queries.GetRefreshTokenWithSession(context.Background(), &hashedToken)

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/MagnaBit/nttf-erp-backend/internal/config"
+	"github.com/MagnaBit/nttf-erp-backend/config"
 	"github.com/MagnaBit/nttf-erp-backend/internal/db"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/session"

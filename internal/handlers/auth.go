@@ -7,15 +7,15 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/session"
 )
 
-type UserHandler struct {
-	service *services.UserService
+type AuthHandler struct {
+	service *services.AuthService
 }
 
-func NewUserHandler(service *services.UserService) *UserHandler {
-	return &UserHandler{service: service}
+func NewAuthHandler(service *services.AuthService) *AuthHandler {
+	return &AuthHandler{service: service}
 }
 
-func (h *UserHandler) Login(c fiber.Ctx) error {
+func (h *AuthHandler) Login(c fiber.Ctx) error {
 	sess := session.FromContext(c)
 	var body dto.LoginReq
 
@@ -39,7 +39,7 @@ func (h *UserHandler) Login(c fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(dto.LoginRes{AuthToken: authToken, RefreshToken: refreshToken})
 }
 
-func (h *UserHandler) RefreshToken(c fiber.Ctx) error {
+func (h *AuthHandler) RefreshToken(c fiber.Ctx) error {
 	sess := session.FromContext(c)
 	refreshToken, ok := sess.Get("refreshToken").(string)
 	if !ok {

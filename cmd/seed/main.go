@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/MagnaBit/nttf-erp-backend/config"
 	"github.com/MagnaBit/nttf-erp-backend/internal/db/generated"
 	"github.com/MagnaBit/nttf-erp-backend/pkg/hash"
 	"github.com/google/uuid"
@@ -123,8 +124,8 @@ func seedUserAndAccounts() {
 }
 
 func main() {
-	var connString string = os.Getenv("GOOSE_DBSTRING")
-	connectDb(connString)
+	cfg := config.Load()
+	connectDb(cfg.DBString)
 	defer dbStore.Close(context.Background())
 
 	seedUserAndAccounts()

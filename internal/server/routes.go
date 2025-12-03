@@ -18,11 +18,11 @@ func (s *WebServer) RegisterRoutes() {
 
 	api := s.App.Group("/api")
 
-	userService := services.NewUserService(s.DB.Queries, s.Config.JWTSecret)
-	userHandler := handlers.NewUserHandler(userService)
+	authService := services.NewAuthService(s.DB.Queries, s.Config.JWTSecret)
+	authHandler := handlers.NewAuthHandler(authService)
 
-	api.Post("/auth/login", userHandler.Login)
-	api.Post("/auth/refresh", userHandler.RefreshToken)
+	api.Post("/auth/login", authHandler.Login)
+	api.Post("/auth/refresh", authHandler.RefreshToken)
 }
 
 func (s *WebServer) HandleIndexRotue(c fiber.Ctx) error {

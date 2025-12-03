@@ -7,7 +7,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/MagnaBit/nttf-erp-backend/internal/config"
+	"github.com/MagnaBit/nttf-erp-backend/config"
 	"github.com/MagnaBit/nttf-erp-backend/internal/server"
 	"github.com/gofiber/fiber/v3"
 
