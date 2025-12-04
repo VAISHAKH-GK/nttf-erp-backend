@@ -8,6 +8,7 @@ import (
 	"github.com/MagnaBit/nttf-erp-backend/config"
 	"github.com/MagnaBit/nttf-erp-backend/internal/db"
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/gofiber/fiber/v3/middleware/session"
 )
 
@@ -42,6 +43,19 @@ func (s *WebServer) Shutdown(ctx context.Context) error {
 	return nil
 }
 
+func (s *WebServer) SetupMiddleware() {
+	s.App.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+		AllowHeaders: []string{"Accept", "Authorization", "Content-Type"},
+	}))
+
+	s.App.Use(session.New(session.Config{
+		CookieHTTPOnly: true,
+		CookieSecure:   true,
+	}))
+}
+
 func New(cfg *config.Config) *WebServer {
 	db := db.ConnectDB(cfg.DBString, cfg.MaxDBConns)
 
@@ -53,10 +67,7 @@ func New(cfg *config.Config) *WebServer {
 		Config: cfg,
 	}
 
-	server.Use(session.New(session.Config{
-		CookieHTTPOnly: true,
-		CookieSecure:   true,
-	}))
+	server.SetupMiddleware()
 
 	return server
 }

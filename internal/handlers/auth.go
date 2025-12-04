@@ -1,6 +1,9 @@
 package handlers
 
 import (
+	"errors"
+
+	"github.com/MagnaBit/nttf-erp-backend/internal/domain"
 	"github.com/MagnaBit/nttf-erp-backend/internal/dto"
 	"github.com/MagnaBit/nttf-erp-backend/internal/services"
 	"github.com/gofiber/fiber/v3"
@@ -23,38 +26,61 @@ func (h *AuthHandler) Login(c fiber.Ctx) error {
 	ip := c.IP()
 
 	if err := c.Bind().Body(&body); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Request Body"})
+		return c.Status(fiber.StatusBadRequest).JSON(dto.ErrorRes{
+			Error:   err.Error(),
+			Message: "Invalid  Request Body",
+		})
 	}
 
-	authToken, refreshToken, err := h.service.Login(body, userAgent, ip)
+	res, err := h.service.Login(c.Context(), body, userAgent, ip)
 	if err != nil {
-		if err == services.ErrInvalidCredentials {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid credentials"})
-		}
-
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Server error"})
+		h.handleError(c, err)
 	}
 
-	sess.Set("refreshToken", refreshToken)
-	return c.Status(fiber.StatusOK).JSON(dto.LoginRes{AuthToken: authToken, RefreshToken: refreshToken})
+	sess.Set("refreshToken", res.RefreshToken)
+	return c.Status(fiber.StatusOK).JSON(res)
 }
 
 func (h *AuthHandler) RefreshToken(c fiber.Ctx) error {
 	sess := session.FromContext(c)
 	refreshToken, ok := sess.Get("refreshToken").(string)
-	if !ok {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "session expired"})
+	if !ok || refreshToken == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(dto.ErrorRes{
+			Error:   "Unauthorized",
+			Message: "No refresh token found in session",
+		})
 	}
 
-	authToken, newRefreshToken, err := h.service.RefreshToken(refreshToken)
+	res, err := h.service.RefreshToken(c.Context(), refreshToken)
 	if err != nil {
-		if err == services.ErrInvalidRefreshToken {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "session expired"})
-		}
-
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Server error"})
+		return h.handleError(c, err)
 	}
 
-	sess.Set("refreshToken", newRefreshToken)
-	return c.Status(fiber.StatusOK).JSON(dto.LoginRes{AuthToken: authToken, RefreshToken: newRefreshToken})
+	sess.Set("refreshToken", res.RefreshToken)
+	return c.Status(fiber.StatusOK).JSON(res)
+}
+
+func (h *AuthHandler) handleError(c fiber.Ctx, err error) error {
+	switch {
+	case errors.Is(err, domain.ErrInvalidCredentials):
+		return c.Status(fiber.StatusUnauthorized).JSON(dto.ErrorRes{
+			Error: "Invalid credentials",
+		})
+	case errors.Is(err, domain.ErrInvalidRefreshToken):
+		return c.Status(fiber.StatusUnauthorized).JSON(dto.ErrorRes{
+			Error: "Invalid or expired refresh token",
+		})
+	case errors.Is(err, domain.ErrSessionExpired):
+		return c.Status(fiber.StatusUnauthorized).JSON(dto.ErrorRes{
+			Error: "Session expired",
+		})
+	case errors.Is(err, domain.ErrTokenRevoked):
+		return c.Status(fiber.StatusUnauthorized).JSON(dto.ErrorRes{
+			Error: "Token has been revoked",
+		})
+	default:
+		return c.Status(fiber.StatusInternalServerError).JSON(dto.ErrorRes{
+			Error: "Internal server error",
+		})
+	}
 }

@@ -10,7 +10,7 @@ import (
 
 type Session struct {
 	Id         uuid.UUID
-	UserId     uuid.UUID
+	UserID     uuid.UUID
 	UserAgent  string
 	IpAddress  netip.Addr
 	CreatedAt  time.Time
@@ -20,7 +20,7 @@ type Session struct {
 
 type RefreshToken struct {
 	Id        uuid.UUID
-	SessionId uuid.UUID
+	SessionID uuid.UUID
 	Token     string
 	CreatedAt time.Time
 	ExpiresAt time.Time

@@ -3,35 +3,44 @@ package services
 import (
 	"context"
 	"errors"
-	"log"
 	"time"
 
-	"github.com/MagnaBit/nttf-erp-backend/internal/db/generated"
+	"github.com/MagnaBit/nttf-erp-backend/internal/domain"
 	"github.com/MagnaBit/nttf-erp-backend/internal/dto"
 	"github.com/MagnaBit/nttf-erp-backend/pkg/hash"
 	"github.com/MagnaBit/nttf-erp-backend/pkg/ip"
 	"github.com/MagnaBit/nttf-erp-backend/pkg/jwt"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5"
 )
 
 type AuthService struct {
-	queries   *generated.Queries
-	jwtSecret string
+	userRepo         domain.UserRepository
+	sessionRepo      domain.SessionRepository
+	refreshTokenRepo domain.RefreshTokenRepository
+	jwtSecret        string
 }
 
-func NewAuthService(queries *generated.Queries, jwtSecret string) *AuthService {
-	return &AuthService{queries: queries, jwtSecret: jwtSecret}
+func NewAuthService(userRepo domain.UserRepository, sessionRepo domain.SessionRepository, refreshTokenRepo domain.RefreshTokenRepository, jwtSecret string) *AuthService {
+	return &AuthService{
+		userRepo:         userRepo,
+		sessionRepo:      sessionRepo,
+		refreshTokenRepo: refreshTokenRepo,
+		jwtSecret:        jwtSecret,
+	}
 }
 
-func (s *AuthService) Login(data dto.LoginReq, userAgent string, ipAddr string) (string, string, error) {
-	user, err := s.queries.GetUserByUsername(context.Background(), data.Username)
+func (s *AuthService) Login(ctx context.Context, data dto.LoginReq, userAgent string, ipAddr string) (*dto.LoginRes, error) {
+	user, err := s.userRepo.GetUserByUsername(ctx, data.Username)
 	if err != nil {
-		return "", "", ErrInvalidCredentials
+		if errors.Is(err, domain.ErrUserNotFound) {
+			return nil, domain.ErrInvalidCredentials
+		}
+
+		return nil, err
 	}
 
 	if err = hash.CompareHash(data.Password, user.Password); err != nil {
-		return "", "", ErrInvalidCredentials
+		return nil, domain.ErrInvalidCredentials
 	}
 
 	authToken, err := jwt.GenerateJwtToken(s.jwtSecret, jwt.Claims{
@@ -41,49 +50,57 @@ func (s *AuthService) Login(data dto.LoginReq, userAgent string, ipAddr string) 
 		Expiry:   time.Now().Add(2 * time.Hour),
 	})
 	if err != nil {
-		return "", "", ErrTokenGeneration
+		return nil, domain.ErrTokenGeneration
 	}
 
-	sessionId, err := s.queries.InsertSession(context.Background(), generated.InsertSessionParams{UserID: user.ID, UserAgent: &userAgent, IpAddress: ip.StringToNetIpAddr(ipAddr)})
+	session := domain.Session{
+		UserID:    user.ID,
+		UserAgent: userAgent,
+		IpAddress: *ip.StringToNetIpAddr(ipAddr),
+	}
+
+	sessionId, err := s.sessionRepo.Create(ctx, &session)
 	if err != nil {
-		return "", "", ErrTokenGeneration
+		return nil, err
 	}
 
-	refreshToken := uuid.NewString()
-	hashedToken := hash.HashToken(refreshToken)
+	refreshTokenString := uuid.NewString()
+	hashedToken := hash.HashToken(refreshTokenString)
 
-	if _, err := s.queries.InsertRefreshToken(context.Background(), generated.InsertRefreshTokenParams{SessionID: sessionId, Token: &hashedToken}); err != nil {
-		return "", "", ErrTokenGeneration
+	refreshToken := domain.RefreshToken{
+		SessionID: sessionId,
+		Token:     hashedToken,
 	}
 
-	return authToken, refreshToken, nil
+	if _, err := s.refreshTokenRepo.Create(ctx, &refreshToken); err != nil {
+		return nil, err
+	}
+
+	return &dto.LoginRes{
+		AuthToken:    authToken,
+		RefreshToken: refreshTokenString,
+	}, nil
 }
 
-func (s *AuthService) RefreshToken(refreshToken string) (string, string, error) {
-	hashedToken := hash.HashToken(refreshToken)
+func (s *AuthService) RefreshToken(ctx context.Context, refreshTokenString string) (*dto.LoginRes, error) {
+	hashedToken := hash.HashToken(refreshTokenString)
 
-	session, err := s.queries.GetRefreshTokenWithSession(context.Background(), &hashedToken)
+	refreshToken, session, err := s.refreshTokenRepo.GetWithSession(ctx, hashedToken)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return "", "", ErrInvalidRefreshToken
-		}
-
-		log.Println("DB Error: " + err.Error())
-		return "", "", ErrDatabase
+		return nil, err
 	}
 
-	if session.IsRevoked || session.SessionExpiresAt.Time.Before(time.Now()) || session.TokenExpiresAt.Time.Before(time.Now()) {
-		return "", "", ErrInvalidRefreshToken
+	if refreshToken.IsRevoked {
+		return nil, domain.ErrTokenRevoked
 	}
 
-	user, err := s.queries.GetUserById(context.Background(), session.UserID)
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return "", "", ErrInvalidRefreshToken
-		}
+	if session.ExpiresAt.Before(time.Now()) || refreshToken.ExpiresAt.Before(time.Now()) {
+		return nil, domain.ErrSessionExpired
+	}
 
-		log.Println("DB Error: " + err.Error())
-		return "", "", ErrDatabase
+	user, err := s.userRepo.GetUserById(ctx, session.UserID)
+	if err != nil {
+		return nil, err
 	}
 
 	newRefresh := uuid.NewString()
@@ -95,19 +112,24 @@ func (s *AuthService) RefreshToken(refreshToken string) (string, string, error) 
 		Expiry:   time.Now().Add(2 * time.Hour),
 	})
 	if err != nil {
-		return "", "", ErrTokenGeneration
+		return nil, domain.ErrTokenGeneration
 	}
 
-	_, err = s.queries.InsertRefreshToken(context.Background(), generated.InsertRefreshTokenParams{SessionID: session.SessionID, Token: &newRefreshHash})
+	refreshToken.SessionID = session.Id
+	refreshToken.Token = newRefreshHash
+
+	_, err = s.refreshTokenRepo.Create(ctx, &refreshToken)
 	if err != nil {
-		return "", "", ErrTokenGeneration
+		return nil, err
 	}
 
-	err = s.queries.RevokeRefreshToken(context.Background(), &hashedToken)
+	err = s.refreshTokenRepo.Revoke(ctx, hashedToken)
 	if err != nil {
-		log.Println("DB Error: " + err.Error())
-		return "", "", ErrDatabase
+		return nil, err
 	}
 
-	return authToken, newRefresh, nil
+	return &dto.LoginRes{
+		AuthToken:    authToken,
+		RefreshToken: newRefresh,
+	}, nil
 }

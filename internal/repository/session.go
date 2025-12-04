@@ -20,7 +20,7 @@ func newSessionRepository(queries *generated.Queries) domain.SessionRepository {
 
 func (r *sessionRepository) Create(ctx context.Context, session *domain.Session) (uuid.UUID, error) {
 	if sessionId, err := r.queries.InsertSession(ctx, generated.InsertSessionParams{
-		UserID:    session.UserId,
+		UserID:    session.UserID,
 		UserAgent: &session.UserAgent,
 		IpAddress: &session.IpAddress,
 	}); err == nil {
@@ -41,7 +41,7 @@ func newRefreshToken(queries *generated.Queries) domain.RefreshTokenRepository {
 
 func (r *refreshTokenRepository) Create(ctx context.Context, refreshToken *domain.RefreshToken) (uuid.UUID, error) {
 	if refreshTokenId, err := r.queries.InsertRefreshToken(ctx, generated.InsertRefreshTokenParams{
-		SessionID: refreshToken.SessionId,
+		SessionID: refreshToken.SessionID,
 		Token:     &refreshToken.Token,
 	}); err == nil {
 		refreshToken.Id = refreshTokenId
@@ -65,12 +65,12 @@ func (r *refreshTokenRepository) GetWithSession(ctx context.Context, hashedToken
 		Token:     *result.Token,
 		ExpiresAt: result.TokenExpiresAt.Time,
 		IsRevoked: result.IsRevoked,
-		SessionId: result.SessionID,
+		SessionID: result.SessionID,
 	}
 
 	session := domain.Session{
 		Id:        result.SessionID,
-		UserId:    result.UserID,
+		UserID:    result.UserID,
 		ExpiresAt: result.SessionExpiresAt.Time,
 	}
 
