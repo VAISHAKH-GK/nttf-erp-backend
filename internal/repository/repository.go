@@ -6,11 +6,15 @@ import (
 )
 
 type Repositories struct {
-	User domain.UserRepository
+	User         domain.UserRepository
+	Session      domain.SessionRepository
+	RefreshToken domain.RefreshTokenRepository
 }
 
 func NewRepositories(queries *generated.Queries) *Repositories {
 	return &Repositories{
-		User: newUserRepository(queries),
+		User:         newUserRepository(queries),
+		Session:      newSessionRepository(queries),
+		RefreshToken: newRefreshToken(queries),
 	}
 }

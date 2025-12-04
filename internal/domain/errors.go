@@ -10,6 +10,12 @@ var (
 	ErrForbidden       = errors.New("forbidden")
 	ErrTokenGeneration = errors.New("token generation failed")
 
+	// Session errors
+	ErrSessionNotFound     = errors.New("session not found")
+	ErrSessionExpired      = errors.New("session expired")
+	ErrInvalidRefreshToken = errors.New("invalid or expired refresh token")
+	ErrTokenRevoked        = errors.New("token has been revoked")
+
 	// User errors
 	ErrUserNotFound       = errors.New("user not found")
 	ErrUserAlreadyExists  = errors.New("user already exists")
