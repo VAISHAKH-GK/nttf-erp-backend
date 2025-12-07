@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/MagnaBit/nttf-erp-backend/internal/db/generated"
-	"github.com/MagnaBit/nttf-erp-backend/internal/domain"
+	"github.com/Keracode/vidyarthidesk-backend/internal/db/generated"
+	"github.com/Keracode/vidyarthidesk-backend/internal/domain"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )

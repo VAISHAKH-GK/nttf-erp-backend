@@ -6,9 +6,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/MagnaBit/nttf-erp-backend/config"
-	"github.com/MagnaBit/nttf-erp-backend/internal/db/generated"
-	"github.com/MagnaBit/nttf-erp-backend/pkg/hash"
+	"github.com/Keracode/vidyarthidesk-backend/config"
+	"github.com/Keracode/vidyarthidesk-backend/internal/db/generated"
+	"github.com/Keracode/vidyarthidesk-backend/pkg/hash"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	_ "github.com/joho/godotenv/autoload"

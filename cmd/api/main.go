@@ -7,8 +7,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/MagnaBit/nttf-erp-backend/config"
-	"github.com/MagnaBit/nttf-erp-backend/internal/server"
+	"github.com/Keracode/vidyarthidesk-backend/config"
+	"github.com/Keracode/vidyarthidesk-backend/internal/server"
 	"github.com/gofiber/fiber/v3"
 
 	_ "github.com/joho/godotenv/autoload"

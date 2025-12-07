@@ -3,9 +3,9 @@ package handlers
 import (
 	"errors"
 
-	"github.com/MagnaBit/nttf-erp-backend/internal/domain"
-	"github.com/MagnaBit/nttf-erp-backend/internal/dto"
-	"github.com/MagnaBit/nttf-erp-backend/internal/services"
+	"github.com/Keracode/vidyarthidesk-backend/internal/domain"
+	"github.com/Keracode/vidyarthidesk-backend/internal/dto"
+	"github.com/Keracode/vidyarthidesk-backend/internal/services"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/session"
 )

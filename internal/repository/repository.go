@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"github.com/MagnaBit/nttf-erp-backend/internal/db/generated"
-	"github.com/MagnaBit/nttf-erp-backend/internal/domain"
+	"github.com/Keracode/vidyarthidesk-backend/internal/db/generated"
+	"github.com/Keracode/vidyarthidesk-backend/internal/domain"
 )
 
 type Repositories struct {

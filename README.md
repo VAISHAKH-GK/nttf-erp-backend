@@ -1,14 +1,15 @@
-# NTTF ERP Backend
+# VidyarthiDesk - Backend
 
-Backend service for the ERP software of **NTTF Tellicherry**.
+Backend of **VidyarthiDesk** ERP Software.
 Built with [Go](https://go.dev/) and [Fiber](https://gofiber.io/).
 
 ## Getting Started
 
 ### Prerequisites
 
-- [Go 1.25](https://go.dev/dl/)
+- Go 1.25
 - Git
+- PostgreSQL
 
 ### Installation
 
@@ -75,7 +76,7 @@ GOOSE_MIGRATION_DIR=./database/migrations
    ```
 3. **Add Upstream**
    ```bash
-   git remote add upstream https://github.com/MagnaBit/nttf-erp-backend.git
+   git remote add upstream https://github.com/Keracode/vidyarthidesk-backend.git
    ```
 4. **Create a new branch**
    ```bash

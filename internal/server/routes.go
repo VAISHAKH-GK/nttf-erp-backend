@@ -1,9 +1,9 @@
 package server
 
 import (
-	"github.com/MagnaBit/nttf-erp-backend/internal/handlers"
-	"github.com/MagnaBit/nttf-erp-backend/internal/repository"
-	"github.com/MagnaBit/nttf-erp-backend/internal/services"
+	"github.com/Keracode/vidyarthidesk-backend/internal/handlers"
+	"github.com/Keracode/vidyarthidesk-backend/internal/repository"
+	"github.com/Keracode/vidyarthidesk-backend/internal/services"
 	"github.com/gofiber/fiber/v3"
 )
 

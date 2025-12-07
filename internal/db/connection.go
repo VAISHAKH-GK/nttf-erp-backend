@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/MagnaBit/nttf-erp-backend/internal/db/generated"
+	"github.com/Keracode/vidyarthidesk-backend/internal/db/generated"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

@@ -5,11 +5,11 @@ import (
 	"errors"
 	"time"
 
-	"github.com/MagnaBit/nttf-erp-backend/internal/domain"
-	"github.com/MagnaBit/nttf-erp-backend/internal/dto"
-	"github.com/MagnaBit/nttf-erp-backend/pkg/hash"
-	"github.com/MagnaBit/nttf-erp-backend/pkg/ip"
-	"github.com/MagnaBit/nttf-erp-backend/pkg/jwt"
+	"github.com/Keracode/vidyarthidesk-backend/internal/domain"
+	"github.com/Keracode/vidyarthidesk-backend/internal/dto"
+	"github.com/Keracode/vidyarthidesk-backend/pkg/hash"
+	"github.com/Keracode/vidyarthidesk-backend/pkg/ip"
+	"github.com/Keracode/vidyarthidesk-backend/pkg/jwt"
 	"github.com/google/uuid"
 )
 

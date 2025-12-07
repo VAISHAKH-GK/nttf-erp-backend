@@ -5,8 +5,8 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/MagnaBit/nttf-erp-backend/config"
-	"github.com/MagnaBit/nttf-erp-backend/internal/db"
+	"github.com/Keracode/vidyarthidesk-backend/config"
+	"github.com/Keracode/vidyarthidesk-backend/internal/db"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/gofiber/fiber/v3/middleware/session"
