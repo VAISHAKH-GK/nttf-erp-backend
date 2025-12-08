@@ -1,0 +1,114 @@
+basePath: /api
+definitions:
+  dto.ErrorRes:
+    properties:
+      error:
+        example: Invalid credentials
+        type: string
+      message:
+        example: Username or password is incorrect
+        type: string
+    type: object
+  dto.LoginReq:
+    description: Login request payload
+    properties:
+      password:
+        example: password
+        minLength: 6
+        type: string
+      username:
+        example: admin
+        maxLength: 50
+        minLength: 3
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  dto.LoginRes:
+    description: Login response with tokens
+    properties:
+      authToken:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+      refreshToken:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+    type: object
+host: localhost:9000
+info:
+  contact:
+    email: vaishakh@vaishakhgk.com
+    name: API Support
+  description: Backend API for VidyarthiDesk ERP Software
+  license:
+    name: GPL-3.0
+    url: https://www.gnu.org/licenses/gpl-3.0.html
+  termsOfService: http://swagger.io/terms/
+  title: VidyarthiDesk API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user with username and password. Returns JWT access
+        token and refresh token stored in session.
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully authenticated
+          schema:
+            $ref: '#/definitions/dto.LoginRes'
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/dto.ErrorRes'
+        "401":
+          description: Invalid username or password
+          schema:
+            $ref: '#/definitions/dto.ErrorRes'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorRes'
+      summary: User login
+      tags:
+      - Authentication
+  /auth/refresh:
+    post:
+      description: Generate new access token and refresh token using existing refresh
+        token from session. Old refresh token is revoked.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: New tokens generated successfully
+          schema:
+            $ref: '#/definitions/dto.LoginRes'
+        "401":
+          description: No refresh token in session, token expired, or token revoked
+          schema:
+            $ref: '#/definitions/dto.ErrorRes'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.ErrorRes'
+      summary: Refresh access token
+      tags:
+      - Authentication
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -7,6 +7,9 @@ else
     RUN = ./$(EXE)
 endif
 
+docs:
+	@swag init -g cmd/api/main.go -o ./docs --parseInternal
+
 sqlc:
 	@sqlc generate
 
@@ -16,7 +19,7 @@ build: sqlc
 seed:
 	@go run cmd/seed/main.go
 
-run: build
+run: docs build
 	@$(RUN)
 
 up:
