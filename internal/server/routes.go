@@ -5,6 +5,7 @@ import (
 	"github.com/Keracode/vidyarthidesk-backend/internal/repository"
 	"github.com/Keracode/vidyarthidesk-backend/internal/services"
 	"github.com/gofiber/fiber/v3"
+	"github.com/yokeTH/gofiber-scalar/scalar/v3"
 )
 
 func (s *WebServer) RegisterRoutes() {
@@ -19,6 +20,14 @@ func (s *WebServer) RegisterRoutes() {
 	authHandler := handlers.NewAuthHandler(authService)
 
 	s.App.Get("/", s.HandleIndexRotue)
+
+	// API Documentation with Scalar UI
+	s.App.Get("/docs", scalar.New(scalar.Config{
+		Title:    "VidyarthiDesk API Documentation",
+		BasePath: "/",
+		Path:     "/docs",
+		Theme:    scalar.ThemeKepler,
+	}))
 
 	api := s.App.Group("/api")
 

@@ -18,6 +18,19 @@ func NewAuthHandler(service *services.AuthService) *AuthHandler {
 	return &AuthHandler{service: service}
 }
 
+// Login godoc
+//
+// @Summary      User login
+// @Description  Authenticate user with username and password. Returns JWT access token and refresh token stored in session.
+// @Tags         Authentication
+// @Accept       json
+// @Produce      json
+// @Param        request  body      dto.LoginReq  true  "Login credentials"
+// @Success      200      {object}  dto.LoginRes  "Successfully authenticated"
+// @Failure      400      {object}  dto.ErrorRes  "Invalid request body or validation error"
+// @Failure      401      {object}  dto.ErrorRes  "Invalid username or password"
+// @Failure      500      {object}  dto.ErrorRes  "Internal server error"
+// @Router       /auth/login [post]
 func (h *AuthHandler) Login(c fiber.Ctx) error {
 	sess := session.FromContext(c)
 	var body dto.LoginReq
@@ -41,6 +54,16 @@ func (h *AuthHandler) Login(c fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(res)
 }
 
+// RefreshToken godoc
+//
+// @Summary      Refresh access token
+// @Description  Generate new access token and refresh token using existing refresh token from session. Old refresh token is revoked.
+// @Tags         Authentication
+// @Produce      json
+// @Success      200  {object}  dto.LoginRes  "New tokens generated successfully"
+// @Failure      401  {object}  dto.ErrorRes  "No refresh token in session, token expired, or token revoked"
+// @Failure      500  {object}  dto.ErrorRes  "Internal server error"
+// @Router       /auth/refresh [post]
 func (h *AuthHandler) RefreshToken(c fiber.Ctx) error {
 	sess := session.FromContext(c)
 	refreshToken, ok := sess.Get("refreshToken").(string)

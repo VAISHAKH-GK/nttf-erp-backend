@@ -11,8 +11,28 @@ import (
 	"github.com/Keracode/vidyarthidesk-backend/internal/server"
 	"github.com/gofiber/fiber/v3"
 
+	_ "github.com/Keracode/vidyarthidesk-backend/docs"
 	_ "github.com/joho/godotenv/autoload"
 )
+
+//	@title			VidyarthiDesk API
+//	@version		1.0
+//	@description	Backend API for VidyarthiDesk ERP Software
+//	@termsOfService	http://swagger.io/terms/
+
+//	@contact.name	API Support
+//	@contact.email	vaishakh@vaishakhgk.com
+
+//	@license.name	GPL-3.0
+//	@license.url	https://www.gnu.org/licenses/gpl-3.0.html
+
+//	@host		localhost:9000
+//	@BasePath	/api
+
+//	@securityDefinitions.apikey	BearerAuth
+//	@in							header
+//	@name						Authorization
+//	@description				Type "Bearer" followed by a space and JWT token.
 
 func gracefulShutDown(fiberServer *server.WebServer) {
 	var ctx, stop = signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
