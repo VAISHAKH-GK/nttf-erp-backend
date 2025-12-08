@@ -21,8 +21,7 @@ func (s *WebServer) RegisterRoutes() {
 
 	s.App.Get("/", s.HandleIndexRotue)
 
-	// API Documentation with Scalar UI
-	s.App.Get("/docs", scalar.New(scalar.Config{
+	s.App.Get("/docs/*", scalar.New(scalar.Config{
 		Title:    "VidyarthiDesk API Documentation",
 		BasePath: "/",
 		Path:     "/docs",
