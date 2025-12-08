@@ -3,7 +3,6 @@ package hash
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -21,7 +20,6 @@ func HashPassword(password string) (string, error) {
 
 func CompareHash(password string, hash string) error {
 	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)); err != nil {
-		fmt.Println(err)
 		return err
 	}
 

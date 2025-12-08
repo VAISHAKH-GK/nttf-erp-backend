@@ -47,7 +47,7 @@ func (h *AuthHandler) Login(c fiber.Ctx) error {
 
 	res, err := h.service.Login(c.Context(), body, userAgent, ip)
 	if err != nil {
-		h.handleError(c, err)
+		return h.handleError(c, err)
 	}
 
 	sess.Set("refreshToken", res.RefreshToken)
