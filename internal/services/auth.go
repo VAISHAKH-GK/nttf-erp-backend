@@ -45,6 +45,7 @@ func (s *AuthService) Login(ctx context.Context, data dto.LoginReq, userAgent st
 
 	authToken, err := jwt.GenerateJwtToken(s.jwtSecret, jwt.Claims{
 		UserId:   user.ID,
+		Name:     user.Name,
 		Email:    user.Email,
 		IssuedAt: time.Now(),
 		Expiry:   time.Now().Add(2 * time.Hour),
@@ -107,6 +108,7 @@ func (s *AuthService) RefreshToken(ctx context.Context, refreshTokenString strin
 	newRefreshHash := hash.HashToken(newRefresh)
 	authToken, err := jwt.GenerateJwtToken(s.jwtSecret, jwt.Claims{
 		UserId:   user.ID,
+		Name:     user.Name,
 		Email:    user.Email,
 		IssuedAt: time.Now(),
 		Expiry:   time.Now().Add(2 * time.Hour),
