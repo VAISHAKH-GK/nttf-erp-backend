@@ -18,8 +18,8 @@ func newUserRepository(queries *generated.Queries) domain.UserRepository {
 	return &userRepository{queries: queries}
 }
 
-func (r *userRepository) GetUserByUsername(ctx context.Context, username string) (*domain.User, error) {
-	user, err := r.queries.GetUserByUsername(ctx, username)
+func (r *userRepository) GetUserByEmail(ctx context.Context, email string) (*domain.User, error) {
+	user, err := r.queries.GetUserByEmail(ctx, email)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, domain.ErrUserNotFound
@@ -48,7 +48,7 @@ func toDomain(user generated.User) *domain.User {
 	return &domain.User{
 		ID:        user.ID,
 		Email:     user.Email,
-		Username:  user.Username,
+		Name:      user.Name,
 		Password:  user.Password,
 		CreatedAt: user.CreatedAt.Time,
 		CreatedBy: user.CreatedBy,

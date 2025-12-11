@@ -10,7 +10,7 @@ import (
 type User struct {
 	ID        uuid.UUID
 	Email     string
-	Username  string
+	Name      string
 	Password  string
 	CreatedAt time.Time
 	CreatedBy uuid.UUID
@@ -19,6 +19,6 @@ type User struct {
 }
 
 type UserRepository interface {
-	GetUserByUsername(ctx context.Context, username string) (*User, error)
+	GetUserByEmail(ctx context.Context, email string) (*User, error)
 	GetUserById(ctx context.Context, id uuid.UUID) (*User, error)
 }

@@ -11,17 +11,17 @@ import (
 	"github.com/google/uuid"
 )
 
-const getUserById = `-- name: GetUserById :one
-SELECT id, email, username, password, created_at, created_by, updated_at, updated_by FROM users WHERE id = $1
+const getUserByEmail = `-- name: GetUserByEmail :one
+SELECT id, email, name, password, created_at, created_by, updated_at, updated_by FROM users WHERE email = $1
 `
 
-func (q *Queries) GetUserById(ctx context.Context, id uuid.UUID) (User, error) {
-	row := q.db.QueryRow(ctx, getUserById, id)
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByEmail, email)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Email,
-		&i.Username,
+		&i.Name,
 		&i.Password,
 		&i.CreatedAt,
 		&i.CreatedBy,
@@ -31,17 +31,17 @@ func (q *Queries) GetUserById(ctx context.Context, id uuid.UUID) (User, error) {
 	return i, err
 }
 
-const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT id, email, username, password, created_at, created_by, updated_at, updated_by FROM users WHERE username = $1
+const getUserById = `-- name: GetUserById :one
+SELECT id, email, name, password, created_at, created_by, updated_at, updated_by FROM users WHERE id = $1
 `
 
-func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
-	row := q.db.QueryRow(ctx, getUserByUsername, username)
+func (q *Queries) GetUserById(ctx context.Context, id uuid.UUID) (User, error) {
+	row := q.db.QueryRow(ctx, getUserById, id)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Email,
-		&i.Username,
+		&i.Name,
 		&i.Password,
 		&i.CreatedAt,
 		&i.CreatedBy,
@@ -52,17 +52,17 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 }
 
 const insertUser = `-- name: InsertUser :one
-INSERT INTO users(email, username, password) VALUES($1, $2, $3) ON CONFLICT DO NOTHING RETURNING id
+INSERT INTO users(email, name, password) VALUES($1, $2, $3) ON CONFLICT DO NOTHING RETURNING id
 `
 
 type InsertUserParams struct {
 	Email    string `json:"email"`
-	Username string `json:"username"`
+	Name     string `json:"name"`
 	Password string `json:"password"`
 }
 
 func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (uuid.UUID, error) {
-	row := q.db.QueryRow(ctx, insertUser, arg.Email, arg.Username, arg.Password)
+	row := q.db.QueryRow(ctx, insertUser, arg.Email, arg.Name, arg.Password)
 	var id uuid.UUID
 	err := row.Scan(&id)
 	return id, err

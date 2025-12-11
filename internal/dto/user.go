@@ -4,7 +4,7 @@ package dto
 //
 //	@Description	Login request payload
 type LoginReq struct {
-	Username string `json:"username" example:"admin" validate:"required" minLength:"3" maxLength:"50"`
+	Email    string `json:"email" example:"admin" validate:"required" minLength:"3" maxLength:"50"`
 	Password string `json:"password" example:"password" validate:"required,min=6" minLength:"6"`
 }
 

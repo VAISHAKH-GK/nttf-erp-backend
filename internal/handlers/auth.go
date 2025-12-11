@@ -21,14 +21,14 @@ func NewAuthHandler(service *services.AuthService) *AuthHandler {
 // Login godoc
 //
 // @Summary      User login
-// @Description  Authenticate user with username and password. Returns JWT access token and refresh token stored in session.
+// @Description  Authenticate user with email and password. Returns JWT access token and refresh token stored in session.
 // @Tags         Authentication
 // @Accept       json
 // @Produce      json
 // @Param        request  body      dto.LoginReq  true  "Login credentials"
 // @Success      200      {object}  dto.LoginRes  "Successfully authenticated"
 // @Failure      400      {object}  dto.ErrorRes  "Invalid request body or validation error"
-// @Failure      401      {object}  dto.ErrorRes  "Invalid username or password"
+// @Failure      401      {object}  dto.ErrorRes  "Invalid email or password"
 // @Failure      500      {object}  dto.ErrorRes  "Internal server error"
 // @Router       /auth/login [post]
 func (h *AuthHandler) Login(c fiber.Ctx) error {

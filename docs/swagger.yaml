@@ -6,24 +6,24 @@ definitions:
         example: Invalid credentials
         type: string
       message:
-        example: Username or password is incorrect
+        example: Email or password is incorrect
         type: string
     type: object
   dto.LoginReq:
     description: Login request payload
     properties:
-      password:
-        example: password
-        minLength: 6
-        type: string
-      username:
+      email:
         example: admin
         maxLength: 50
         minLength: 3
         type: string
+      password:
+        example: password
+        minLength: 6
+        type: string
     required:
+    - email
     - password
-    - username
     type: object
   dto.LoginRes:
     description: Login response with tokens
@@ -52,8 +52,8 @@ paths:
     post:
       consumes:
       - application/json
-      description: Authenticate user with username and password. Returns JWT access
-        token and refresh token stored in session.
+      description: Authenticate user with email and password. Returns JWT access token
+        and refresh token stored in session.
       parameters:
       - description: Login credentials
         in: body
@@ -73,7 +73,7 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorRes'
         "401":
-          description: Invalid username or password
+          description: Invalid email or password
           schema:
             $ref: '#/definitions/dto.ErrorRes'
         "500":

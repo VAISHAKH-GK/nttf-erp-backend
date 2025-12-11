@@ -44,7 +44,7 @@ type Session struct {
 type User struct {
 	ID        uuid.UUID          `json:"id"`
 	Email     string             `json:"email"`
-	Username  string             `json:"username"`
+	Name      string             `json:"name"`
 	Password  string             `json:"password"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	CreatedBy uuid.UUID          `json:"created_by"`

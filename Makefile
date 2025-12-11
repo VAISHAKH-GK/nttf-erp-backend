@@ -1,3 +1,5 @@
+.PHONY: docs sqlc build seed run up up-by-one down down-by-one db-reset db-status
+
 # Detect OS
 ifeq ($(OS),Windows_NT)
     EXE = bin\api.exe

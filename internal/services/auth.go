@@ -30,7 +30,7 @@ func NewAuthService(userRepo domain.UserRepository, sessionRepo domain.SessionRe
 }
 
 func (s *AuthService) Login(ctx context.Context, data dto.LoginReq, userAgent string, ipAddr string) (*dto.LoginRes, error) {
-	user, err := s.userRepo.GetUserByUsername(ctx, data.Username)
+	user, err := s.userRepo.GetUserByEmail(ctx, data.Email)
 	if err != nil {
 		if errors.Is(err, domain.ErrUserNotFound) {
 			return nil, domain.ErrInvalidCredentials
